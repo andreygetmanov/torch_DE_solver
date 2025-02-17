@@ -95,6 +95,26 @@ class NysNewtonCG(Optimizer):
     def __init__(self, params, lr=1.0, rank=10, mu=1e-4, chunk_size=1,
                  cg_tol=1e-16, cg_max_iters=1000, line_search_fn=None, verbose=False,precond_update_frequency=20,eigencdecomp_shift_attepmt_count=20):
 
+        """
+    Initializes the NysNewtonCG optimizer.
+
+    Args:
+        params (list): List of parameters to optimize.
+        lr (float, optional): Learning rate. Defaults to 1.0.
+        rank (int, optional): Rank of the approximation. Defaults to 10.
+        mu (float, optional): Regularization parameter. Defaults to 1e-4.
+        chunk_size (int, optional): Chunk size for the conjugate gradient method. Defaults to 1.
+        cg_tol (float, optional): Tolerance for the conjugate gradient method. Defaults to 1e-16.
+        cg_max_iters (int, optional): Maximum number of iterations for the conjugate gradient method. Defaults to 1000.
+        line_search_fn (str or callable, optional): Line search function. Defaults to None.
+        verbose (bool, optional): Whether to print verbose output. Defaults to False.
+        precond_update_frequency (int, optional): Frequency of preconditioner updates. Defaults to 20.
+        eigencdecomp_shift_attepmt_count (int, optional): Number of attempts to shift the eigenvalue decomposition. Defaults to 20.
+
+    Returns:
+        None
+    """
+
         defaults = dict(lr=lr, rank=rank, chunk_size=chunk_size, mu=mu, cg_tol=cg_tol,
                         cg_max_iters=cg_max_iters, line_search_fn=line_search_fn, precond_update_frequency=precond_update_frequency,eigencdecomp_shift_attepmt_count=eigencdecomp_shift_attepmt_count)
         self.rank = rank
@@ -271,21 +291,64 @@ class NysNewtonCG(Optimizer):
             print(f'Approximate eigenvalues = {self.S}')
 
     def _hvp_vmap(self, grad_params, params):
+        """
+    Vectorized computation of the Hessian-vector product.
+
+    This method uses `vmap` to compute the Hessian-vector product for multiple
+    vectors in parallel.
+
+    Args:
+        grad_params: The gradient of the parameters.
+        params: The model parameters.
+
+    Returns:
+        None
+    """
         return vmap(lambda v: self._hvp(grad_params, params, v), in_dims=0, chunk_size=self.chunk_size)
 
     def _hvp(self, grad_params, params, v):
+        """
+    Computes the Hessian-vector product (Hv) of the gradient of the parameters with respect to the model's parameters.
+
+    Args:
+        grad_params: The gradient of the parameters with respect to the loss.
+        params: The model's parameters.
+        v: The vector to compute the Hessian-vector product with.
+
+    Returns:
+        torch.Tensor: The Hessian-vector product (Hv) as a 1D tensor.
+    """
         Hv = torch.autograd.grad(grad_params, params, grad_outputs=v,
                                  retain_graph=True)
         Hv = tuple(Hvi.detach() for Hvi in Hv)
         return torch.cat([Hvi.reshape(-1) for Hvi in Hv])
 
     def _numel(self):
+        """
+    Returns the total number of elements in all parameters.
+
+    Args:
+        self: The instance of the class.
+
+    Returns:
+        int: The total number of elements in all parameters.
+    """
         if self._numel_cache is None:
             self._numel_cache = reduce(
                 lambda total, p: total + p.numel(), self._params, 0)
         return self._numel_cache
 
     def _add_grad(self, step_size, update):
+        """
+    Adds the gradient update to the model parameters.
+
+    Args:
+        step_size (float): The learning rate for the update.
+        update (torch.Tensor): The gradient update tensor.
+
+    Returns:
+        None
+    """
         offset = 0
         for p in self._params:
             numel = p.numel()
@@ -296,9 +359,27 @@ class NysNewtonCG(Optimizer):
         assert offset == self._numel()
 
     def _clone_param(self):
+        """
+    Creates a deep copy of the model's parameters.
+
+    Args:
+        self: The model instance.
+
+    Returns:
+        list: A list of cloned model parameters with contiguous memory format.
+    """
         return [p.clone(memory_format=torch.contiguous_format) for p in self._params]
 
     def _set_param(self, params_data):
+        """
+    Sets the parameters of the model.
+
+    Args:
+        params_data (list of torch.Tensor): A list of tensors containing the new parameter values.
+
+    Returns:
+        None
+    """
         for p, pdata in zip(self._params, params_data):
             # Replace the .data attribute of the tensor
             p.data = pdata.data

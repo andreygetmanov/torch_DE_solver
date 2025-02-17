@@ -95,6 +95,25 @@ def check_param_name(module_name: str, param_name: str) -> bool:
         return False
 
 class Config:
+    """
+    A class for managing configuration settings.
+
+    The Config class provides a way to initialize and modify configuration settings
+    used in the optimization solver. It allows for loading custom configurations from
+    a JSON file and manually setting individual parameters.
+
+    Methods:
+        __init__(config_path): Initializes the config with default settings and
+            optionally loads a custom configuration from a JSON file.
+        set_parameter(parameter_string, value): Sets a configuration parameter
+            manually, performing checks to ensure correct formatting.
+
+    Attributes:
+        None
+
+    Raises:
+        None
+    """
     def __init__(self, *args):
         """
         We initialize config with default one

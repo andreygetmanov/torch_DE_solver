@@ -3,9 +3,41 @@ from typing import Any
 from tedeous.device import device_type
 
 class Closure():
+    """
+    A class that provides a closure for various optimization algorithms.
+
+    The Closure class is responsible for managing the model, optimizer, and other
+    necessary attributes for optimization. It provides methods for setting the model,
+    retrieving the model, and performing optimization steps.
+
+    Methods:
+        __init__: Initializes the object with the given mixed precision and model.
+        set_model: Sets the model for the current object.
+        model: Returns the internal model instance.
+        _amp_mixed: Prepares for mixed precision operations.
+        _closure: Performs a single optimization step.
+        _closure_pso: Evaluates the loss and gradients for particle swarm optimization.
+        _closure_ngd: Performs a single iteration of the neural gradient descent algorithm.
+        _closure_nncg: Computes the loss and gradients for the neural network using the optimizer.
+        get_closure: Retrieves the closure based on the specified type.
+
+    Attributes:
+        model: The internal model instance.
+    """
     def __init__(self,
         mixed_precision: bool,
         model):
+
+        """
+    Initializes the object with the given mixed precision and model.
+
+    Args:
+        mixed_precision (bool): Whether to use mixed precision training.
+        model: The model to be used.
+
+    Returns:
+        None
+    """
 
         self.mixed_precision = mixed_precision
         self.set_model(model)
@@ -19,10 +51,28 @@ class Closure():
 
 
     def set_model(self, model):
+        """
+    Sets the model for the current object.
+
+    Args:
+        model: The model to be set.
+
+    Returns:
+        None
+    """
         self._model = model
 
     @property
     def model(self):
+        """
+    Returns the internal model instance.
+
+    Args:
+        None
+
+    Returns:
+        The internal model instance.
+    """
         return self._model
 
     def _amp_mixed(self):
@@ -48,6 +98,15 @@ class Closure():
         
 
     def _closure(self):
+        """
+    Performs a single optimization step by computing the loss, applying backpropagation, and updating the model parameters.
+
+    Args:
+        self: The instance of the class, providing access to the model, optimizer, and other relevant attributes.
+
+    Returns:
+        torch.Tensor: The computed loss value.
+    """
         self.optimizer.zero_grad()
         with torch.autocast(device_type=self.device,
                             dtype=self.dtype,
@@ -65,6 +124,20 @@ class Closure():
         return loss
 
     def _closure_pso(self):
+        """
+    Evaluates the loss and gradients for the particle swarm optimization.
+
+    This method is a closure that computes the loss and gradients for each particle
+    in the swarm, and returns the losses and gradients as tensors.
+
+    Args:
+        self: The instance of the class, which contains the model, optimizer, and other necessary attributes.
+
+    Returns:
+        tuple: A tuple containing two tensors:
+            losses (torch.Tensor): A 1D tensor of shape (num_particles,) containing the losses for each particle.
+            gradients (torch.Tensor): A 2D tensor of shape (num_particles, num_params) containing the gradients for each particle.
+    """
         def loss_grads():
             self.optimizer.zero_grad()
             with torch.autocast(device_type=self.device,
@@ -97,6 +170,24 @@ class Closure():
         return losses, gradients
     
     def _closure_ngd(self):
+        """
+    Performs a single iteration of the neural gradient descent algorithm.
+
+    This method is responsible for computing the loss, applying backpropagation,
+    updating the model parameters, and computing the current loss value.
+
+    Args:
+        self: The instance of the class, providing access to the model, optimizer,
+            and other necessary attributes.
+
+    Returns:
+        A tuple containing:
+            - int_res: The result of the PDE computation.
+            - bval: The boundary value.
+            - true_bval: The true boundary value.
+            - loss: The current loss value.
+            - evaluate: The evaluation function of the model's solution class.
+    """
         self.optimizer.zero_grad()
         with torch.autocast(device_type=self.device,
                             dtype=self.dtype,
@@ -117,6 +208,17 @@ class Closure():
         return int_res, bval, true_bval, loss, self.model.solution_cls.evaluate
 
     def _closure_nncg(self):
+        """
+    Computes the loss and gradients for the neural network using the optimizer.
+
+    Args:
+        self: The instance of the class, which contains the model, optimizer, and other necessary attributes.
+
+    Returns:
+        A tuple containing:
+            loss (torch.Tensor): The computed loss value.
+            grads (torch.Tensor): The computed gradients of the loss with respect to the model's parameters.
+    """
         self.optimizer.zero_grad()
         with torch.autocast(device_type=self.device,
                             dtype=self.dtype,
@@ -144,6 +246,15 @@ class Closure():
 
 
     def get_closure(self, _type: str):
+        """
+    Retrieves the closure based on the specified type.
+
+    Args:
+        _type (str): The type of closure to retrieve. Can be 'PSO', 'CSO', 'NGD', 'NNCG', or any other type.
+
+    Returns:
+        None: The closure of the specified type. If _type is not recognized, returns the default closure.
+    """
         if _type in ('PSO', 'CSO'):
             return self._closure_pso
         elif _type == 'NGD':
