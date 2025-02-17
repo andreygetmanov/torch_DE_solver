@@ -33,6 +33,15 @@ class Domain():
     """class for grid building
     """
     def __init__(self, type='uniform'):
+        """
+    Initializes the object with a specified distribution type.
+
+    Args:
+        type (str): The type of distribution. Defaults to 'uniform'.
+
+    Returns:
+        None
+    """
         self.type = type
         self.variable_dict = {}
     
@@ -91,6 +100,15 @@ class Conditions():
     """class for adding the conditions: initial, boundary, and data.
     """
     def __init__(self):
+        """
+    Initializes a new instance of the class.
+
+    Args:
+        self: A reference to the current instance of the class.
+
+    Returns:
+        None
+    """
         self.conditions_lst = []
 
     def dirichlet(
@@ -276,6 +294,15 @@ class Equation():
     """class for adding eqution.
     """
     def __init__(self):
+        """
+    Initializes an instance of the class.
+
+    Args:
+        self: A reference to the current instance of the class.
+
+    Returns:
+        None
+    """
         self.equation_lst = []
     
     def add(self, eq: dict):

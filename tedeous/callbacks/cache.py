@@ -373,5 +373,17 @@ class Cache(Callback):
             return self._cache_mat()
 
     def on_train_begin(self, logs=None):
+        """
+    Called at the beginning of training.
+
+    This method is a callback that is invoked at the start of the training process.
+    It caches the current state and sets the model's save directory.
+
+    Args:
+        logs (dict, optional): Dictionary of logs. Defaults to None.
+
+    Returns:
+        None
+    """
         self.cache()
         self.model._save_dir = self.cache_dir
