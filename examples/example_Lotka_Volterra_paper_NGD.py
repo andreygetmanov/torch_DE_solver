@@ -70,7 +70,36 @@ def train_net(net,grid,exact):
 
 # Define the model
 class MultiOutputModel(torch.nn.Module):
+    """
+    A neural network model that outputs multiple values from a shared base network.
+
+    This class represents a multi-output model that consists of a shared base network and
+    two output heads for Process 1 and Process 2.
+
+    Methods:
+        __init__: Initializes the model by setting up the shared layers and output heads.
+        forward: Performs a forward pass through the network, returning the concatenated output of both output heads.
+
+    Attributes:
+        None
+
+    Examples:
+        >>> model = MultiOutputModel()
+        >>> input_tensor = torch.randn(1, 3, 224, 224)
+        >>> output = model(input_tensor)
+    """
     def __init__(self):
+        """
+    Initializes a MultiOutputModel instance.
+
+    This method sets up the shared layers (base network) and output heads for Process 1 and Process 2.
+
+    Args:
+        self: The instance of the class.
+
+    Returns:
+        None
+    """
         super(MultiOutputModel, self).__init__()
         
         self.width_out=[2]
@@ -85,6 +114,15 @@ class MultiOutputModel(torch.nn.Module):
         self.process2_fc = torch.nn.Linear(32, 1)
     
     def forward(self, t):
+        """
+    Performs a forward pass through the network.
+
+    Args:
+        t (torch.Tensor): Input tensor to be processed.
+
+    Returns:
+        torch.Tensor: Concatenated output of process 1 and process 2 output heads.
+    """
         # Shared layers forward pass
         x = torch.tanh(self.shared_fc1(t))
         x = torch.tanh(self.shared_fc2(x))

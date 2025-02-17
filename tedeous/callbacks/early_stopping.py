@@ -122,6 +122,19 @@ class EarlyStopping(Callback):
             print(info)
 
     def on_epoch_end(self, logs=None):
+        """
+    Performs checks at the end of an epoch.
+
+    This method is called at the end of each epoch to perform various checks, 
+    including window check, patience check, and absolute loss check. It also 
+    updates the minimum loss and saves the best model if necessary.
+
+    Args:
+        logs (dict, optional): Dictionary of logs. Defaults to None.
+
+    Returns:
+        None
+    """
         self._window_check()
         self._patience_check()
         self._absloss_check()
@@ -141,6 +154,19 @@ class EarlyStopping(Callback):
         self._check = None
 
     def on_epoch_begin(self, logs=None):
+        """
+    Called at the beginning of each epoch.
+
+    This method is a callback that is invoked at the start of each epoch. It
+    updates the current time step, mode, and loss checking flag based on the
+    model's state. It also stores the previous loss value in a buffer.
+
+    Args:
+        logs (dict, optional): Additional information about the epoch. Defaults to None.
+
+    Returns:
+        None
+    """
         self.t = self.model.t
         self.mode = self.model.mode
         self._check = self.model._check

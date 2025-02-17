@@ -9,12 +9,43 @@ from torch.optim.lr_scheduler import ExponentialLR
 
 
 class Optimizer():
+    """
+    A class for managing and configuring optimizers for machine learning models.
+
+    The Optimizer class provides a flexible way to select and configure different
+    optimization algorithms for training machine learning models. It supports a range
+    of built-in optimizers and allows for custom optimizer definitions.
+
+    Methods:
+        __init__(optimizer, params, gamma=None, decay_every=None):
+            Initializes the object with the given optimizer, parameters, and learning rate decay settings.
+        optimizer_choice(optimizer, learning_rate):
+            Sets the optimizer and returns a ready-to-use optimizer object.
+
+    Attributes:
+        optimizer (str): The name of the optimizer to use.
+        params (dict): A dictionary of parameters for the optimizer.
+        gamma (float, optional): The learning rate decay factor. Defaults to None.
+        decay_every (int, optional): The number of steps between learning rate decays. Defaults to None.
+    """
     def __init__(
             self,
             optimizer: str,
             params: dict,
             gamma: Union[float, None]=None,
             decay_every: Union[int, None]=None):
+        """
+    Initializes the object with the given optimizer, parameters, and learning rate decay settings.
+
+    Args:
+        optimizer (str): The name of the optimizer to use.
+        params (dict): A dictionary of parameters for the optimizer.
+        gamma (Union[float, None], optional): The learning rate decay factor. Defaults to None.
+        decay_every (Union[int, None], optional): The number of steps between learning rate decays. Defaults to None.
+
+    Returns:
+        None
+    """
         self.optimizer = optimizer
         self.params = params
         self.gamma = gamma
