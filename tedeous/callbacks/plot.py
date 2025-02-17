@@ -154,6 +154,15 @@ class Plots(Callback):
             plt.close()
 
     def on_epoch_end(self, logs=None):
+        """
+    Called at the end of an epoch.
+
+    Args:
+        logs (dict, optional): Dictionary of logs. Defaults to None.
+
+    Returns:
+        None
+    """
         self.solution_print()
 
 
