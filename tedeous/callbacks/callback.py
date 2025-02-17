@@ -5,19 +5,57 @@ class Callback(ABC):
     """
 
     def __init__(self):
+        """
+    Initializes the object.
+
+    Initializes the object with default values for print_every, verbose, validation_data, and _model.
+
+    Args:
+        self: The instance of the class.
+
+    Returns:
+        None
+    """
         self.print_every = None
         self.verbose = 0
         self.validation_data = None
         self._model = None
 
     def set_params(self, params):
+        """
+    Sets the parameters for the object.
+
+    Args:
+        params (dict): A dictionary of parameters to be set.
+
+    Returns:
+        None
+    """
         self.params = params
 
     def set_model(self, model):
+        """
+    Sets the model for the current object.
+
+    Args:
+        model: The model to be set.
+
+    Returns:
+        None
+    """
         self._model = model
 
     @property
     def model(self):
+        """
+    Returns the internal model instance.
+
+    Args:
+        self: The instance of the class.
+
+    Returns:
+        None: The internal model instance.
+    """
         return self._model
 
     def on_epoch_begin(self, logs=None):
@@ -73,4 +111,13 @@ class Callback(ABC):
         pass
 
     def during_epoch(self, logs=None):
+        """
+    Called at the end of an epoch during training.
+
+    Args:
+        logs (dict, optional): Dictionary of logs. Defaults to None.
+
+    Returns:
+        None
+    """
         pass

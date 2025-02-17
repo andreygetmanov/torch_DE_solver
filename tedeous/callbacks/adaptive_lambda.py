@@ -122,4 +122,13 @@ class AdaptiveLambda(Callback):
             lambda_print(sln_cls.lambda_bound, bval_keys)
 
     def on_epoch_end(self, logs=None):
+        """
+    Called at the end of each epoch.
+
+    Args:
+        logs (dict, optional): Dictionary of logs. Defaults to None.
+
+    Returns:
+        None
+    """
         self.lambda_update()
